@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: sharding-base-on-time
+  datasource:
+    username: root
+    password: mysqlroot
+    url: jdbc:mysql://192.168.31.65:43306/shard?characterEncoding=utf8&useSSL=false
+    actualDataNodes: shard_0$->{1..2}.order_info_$->{2207..2212}
+    sqlShow: true
+    druid:
+      max-active: 10
+  shard:
+    data-sources:
+      shard:
+        username: root
+        password: mysqlroot
+        url: jdbc:mysql://192.168.31.65:43306/shard?characterEncoding=utf8&useSSL=false
+      shard_01:
+        username: root
+        password: mysqlroot
+        url: jdbc:mysql://192.168.31.65:43306/shard_01?characterEncoding=utf8&useSSL=false
+      shard_02:
+        username: root
+        password: mysqlroot
+        url: jdbc:mysql://192.168.31.65:43306/shard_02?characterEncoding=utf8&useSSL=false
+      default:
+        username: root
+        password: mysqlroot
+        url: jdbc:mysql://192.168.31.65:43306/shard-default?characterEncoding=utf8&useSSL=false
+        initial-size: 2
+        max-active: 10
+    tables:
+      order_info:
+        logicTable: order_info
+        actualDataNodes: shard_0$->{1..2}.order_info_$->{2207..2212}
+        sharding-columns: id
+mybatis:
+  mapper-locations: mapper/**/*.xml
