@@ -1,6 +1,5 @@
 package com.shiyuan.sharingbaseontimemode.config;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceWrapper;
 import com.alibaba.fastjson.JSON;
 import com.shiyuan.sharingbaseontimemode.config.shard.DatasourceConfigProperties;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -39,14 +37,6 @@ import java.util.Properties;
 @Slf4j
 @Configuration
 public class ShardingDataSourceConfiguration {
-
-    @Value("${spring.datasource.username:root}")
-    private String username;
-
-    @Value("${spring.datasource.password:mysqlroot}")
-    private String password;
-    @Value("${spring.datasource.url}")
-    private String jdbcUrl;
 
     @Value("${spring.datasource.sqlShow:true}")
     private String sqlShow;
@@ -65,7 +55,8 @@ public class ShardingDataSourceConfiguration {
     @ConditionalOnBean(ShardConfig.class)
     public DataSource shardingDataSource(ShardConfig shardConfig) throws SQLException {
 
-       // MasterSlaveRuleConfiguration masterSlaveRuleConfiguration = new MasterSlaveRuleConfiguration();
+        MasterSlaveRuleConfiguration masterSlaveRuleConfiguration = new MasterSlaveRuleConfiguration("", "", null);
+
 
         System.out.println("[TableRuleConfig] " + JSON.toJSONString(shardConfig));
         ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
@@ -118,15 +109,6 @@ public class ShardingDataSourceConfiguration {
             log.warn("[init DataSource] name:{}, url:{}", datasourceName, datasourceConfig.getUrl());
         }
         return map;
-    }
-
-    private DataSource createDataSource(String jdbcUrl) {
-        DruidDataSourceWrapper druidDataSourceWrapper = new DruidDataSourceWrapper();
-        druidDataSourceWrapper.setUrl(jdbcUrl);
-        druidDataSourceWrapper.setUsername(username);
-        druidDataSourceWrapper.setPassword(password);
-        druidDataSourceWrapper.setDriverClassName(com.mysql.cj.jdbc.Driver.class.getName());
-        return druidDataSourceWrapper;
     }
 
 }
