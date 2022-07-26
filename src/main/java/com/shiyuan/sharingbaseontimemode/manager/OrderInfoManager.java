@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OrderInfoManager {
 
     private final OrderInfoMapper orderInfoMapper;
+    private final RedisManager redisManager;
 
     private static final AtomicInteger count = new AtomicInteger(0);
 
@@ -32,7 +33,13 @@ public class OrderInfoManager {
     }
 
     public OrderInfo queryOrderInfo(Long orderId){
-        return orderInfoMapper.selectByPrimaryKey(orderId);
+        OrderInfo cache = redisManager.getCache(orderId + "", OrderInfo.class);
+        if (cache != null){
+            return cache;
+        }
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+        redisManager.setCache(orderId+"", orderInfo);
+        return orderInfo;
     }
 
     public Object queryOrderList(String productName){

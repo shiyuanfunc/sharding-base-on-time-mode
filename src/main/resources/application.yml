@@ -1,8 +1,19 @@
 spring:
   application:
     name: sharding-base-on-time
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    lettuce:
+      pool:
+        max-wait: 10000ms
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        time-between-eviction-runs: -1
+
   datasource:
-    actualDataNodes: shard_0$->{1..2}.order_info_$->{2207..2212}
+    actualDataNodes: shard_01.order_info_$->{2207..2212}
     sqlShow: true
     druid:
       max-active: 10
@@ -16,16 +27,24 @@ spring:
         username: root
         password: mysqlroot
         url: jdbc:mysql://192.168.31.65:53306/shard_01?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-      shard_02:
+      shard_01_master:
         username: root
         password: mysqlroot
-        url: jdbc:mysql://192.168.31.65:53306/shard_02?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:mysql://192.168.31.65:53306/shard_01?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+#      shard_02:
+#        username: root
+#        password: mysqlroot
+#        url: jdbc:mysql://192.168.31.65:53306/shard_02?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
       default:
         username: root
         password: mysqlroot
         url: jdbc:mysql://192.168.31.65:53306/shard-default?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         initial-size: 2
         max-active: 10
+      slave:
+        username: root
+        password: mysqlroot
+        url: jdbc:mysql://192.168.31.65:53406/shard_01?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     tables:
       order_info:
         logicTable: order_info
