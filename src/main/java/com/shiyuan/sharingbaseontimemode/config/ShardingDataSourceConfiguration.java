@@ -69,6 +69,7 @@ public class ShardingDataSourceConfiguration {
         }
         Properties properties = new Properties();
         properties.put("sql.show", sqlShow);
+        // 配置主从时
         shardingRuleConfig.setMasterSlaveRuleConfigs(this.getMasterSlaveRuleConfigurations());
         return ShardingDataSourceFactory.createDataSource(dataSourceMap, shardingRuleConfig, properties);
     }
@@ -115,8 +116,9 @@ public class ShardingDataSourceConfiguration {
 
 
     private List<MasterSlaveRuleConfiguration> getMasterSlaveRuleConfigurations() {
-        MasterSlaveRuleConfiguration masterSlaveRuleConfig1 = new MasterSlaveRuleConfiguration("shard_01_ms",
-                "shard_01_master", Collections.singletonList("slave"));
+        // 配置主从时 若该库/表涉及分表，第一个参数name 需要满足 actualDataNodes: shard_01.order_info_$->{2207..2212}此处的库名规则
+        MasterSlaveRuleConfiguration masterSlaveRuleConfig1 = new MasterSlaveRuleConfiguration("shard_01",
+                "shard_01_master", Collections.singletonList("shard_01_slave"));
 //        MasterSlaveRuleConfiguration masterSlaveRuleConfig2 = new MasterSlaveRuleConfiguration("shard_02_ms",
 //                "shard_02", Collections.singletonList("shard_02_slave"));
         return Lists.newArrayList(masterSlaveRuleConfig1);

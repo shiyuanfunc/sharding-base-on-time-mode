@@ -33,10 +33,10 @@ public class OrderInfoManager {
     }
 
     public OrderInfo queryOrderInfo(Long orderId){
-        OrderInfo cache = redisManager.getCache(orderId + "", OrderInfo.class);
-        if (cache != null){
-            return cache;
-        }
+//        OrderInfo cache = redisManager.getCache(orderId + "", OrderInfo.class);
+//        if (cache != null){
+//            return cache;
+//        }
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
         redisManager.setCache(orderId+"", orderInfo);
         return orderInfo;
