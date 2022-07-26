@@ -32,13 +32,13 @@ public class RedisManager {
      * @return
      */
     public boolean setCache(String key, Object value, Long expireTime, TimeUnit timeUnit){
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         if (expireTime != null && timeUnit != null){
             redisTemplate.opsForValue().set(key, value, expireTime, timeUnit);
         }else {
             redisTemplate.opsForValue().set(key, value);
         }
-        log.info("[redis] set cache cost time: {}", System.currentTimeMillis() - startTime);
+        log.info("[redis] set cache cost time: {} ns", System.nanoTime() - startTime);
         return Boolean.TRUE;
     }
 
@@ -50,12 +50,12 @@ public class RedisManager {
      * @param <T>
      */
     public <T> T getCache(String key, Class<T> clz){
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         Object result = redisTemplate.opsForValue().get(key);
         if (result == null){
             return null;
         }
-        log.info("[redis] get cache cost time: {}", System.currentTimeMillis() - startTime);
+        log.info("[redis] get cache cost time: {} ns", System.nanoTime() - startTime);
         return JSON.parseObject(result.toString(), clz);
     }
 
