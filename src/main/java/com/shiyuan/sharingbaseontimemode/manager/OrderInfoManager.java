@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -33,12 +34,12 @@ public class OrderInfoManager {
     }
 
     public OrderInfo queryOrderInfo(Long orderId){
-//        OrderInfo cache = redisManager.getCache(orderId + "", OrderInfo.class);
-//        if (cache != null){
-//            return cache;
-//        }
+        OrderInfo cache = redisManager.getCache(orderId + "", OrderInfo.class);
+        if (cache != null){
+            return cache;
+        }
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
-        redisManager.setCache(orderId+"", orderInfo);
+        redisManager.setCache(orderId+"", orderInfo, 15L, TimeUnit.MINUTES);
         return orderInfo;
     }
 
