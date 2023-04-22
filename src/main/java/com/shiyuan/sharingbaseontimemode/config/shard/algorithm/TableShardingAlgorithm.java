@@ -26,12 +26,7 @@ public class TableShardingAlgorithm implements PreciseShardingAlgorithm<Long> {
         String logicTableName = shardingValue.getLogicTableName();
         log.warn("[TableShardingAlgorithm] 表分片key:{}, logic_table_name:{}, 可用的表:{}",
                 value, logicTableName, JSON.toJSONString(availableTableNames));
-        String tableSuffix = TableUtils.subTableName(value.toString());
-        String tableName = logicTableName + "_" + tableSuffix;
-        if (!availableTableNames.contains(tableName)) {
-            ArrayList<String> availableTableNameList = new ArrayList<>(availableTableNames);
-            tableName = availableTableNameList.get(0);
-        }
+        String tableName = logicTableName + "_" + (value % availableTableNames.size() + 1);
         log.warn("[TableShardingAlgorithm] 当前选中的tableName:{}", tableName);
         return tableName;
     }

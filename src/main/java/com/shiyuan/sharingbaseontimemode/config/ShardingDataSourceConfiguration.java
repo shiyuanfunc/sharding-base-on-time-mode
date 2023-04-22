@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * @Author MUSI
@@ -62,29 +63,32 @@ public class ShardingDataSourceConfiguration {
 
         log.info("[TableRuleConfig] {}", JSON.toJSONString(shardConfig));
         ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
-        shardingRuleConfig.getTableRuleConfigs().add(tableOrderInfoRuleConfiguration());
+        shardingRuleConfig.getTableRuleConfigs().addAll(this.buildShardTableRule(shardConfig));
         Map<String, DataSource> dataSourceMap = createDataSourceMap(shardConfig);
         if (dataSourceMap.containsKey("default")) {
             shardingRuleConfig.setDefaultDataSourceName("default");
         }
         Properties properties = new Properties();
         properties.put("sql.show", sqlShow);
-        // 配置主从时
-        shardingRuleConfig.setMasterSlaveRuleConfigs(this.getMasterSlaveRuleConfigurations());
         return ShardingDataSourceFactory.createDataSource(dataSourceMap, shardingRuleConfig, properties);
     }
-    private TableRuleConfiguration buildShardTableRule(Map.Entry<String, ShardTableConfigProperties> shardTableRuleEntry) {
-        String tableName = shardTableRuleEntry.getKey();
-        ShardTableConfigProperties shardTableConfigProperties = shardTableRuleEntry.getValue();
-        TableRuleConfiguration tableRuleConfiguration = new TableRuleConfiguration(tableName, shardTableConfigProperties.getActualDataNodes());
-        return tableRuleConfiguration;
+    private List<TableRuleConfiguration> buildShardTableRule(ShardConfig shardConfig) {
+        return shardConfig.getTables().entrySet()
+                .stream()
+                .map(entry -> {
+                    String logicTable = entry.getKey();
+                    ShardTableConfigProperties shardTableConfigProperties = entry.getValue();
+                    TableRuleConfiguration tableRuleConfiguration = new TableRuleConfiguration(logicTable, shardTableConfigProperties.getActualDataNodes());
+                    tableRuleConfiguration.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration(shardTableConfigProperties.getShardingColumns(), tableShardingAlgorithm));
+                    return tableRuleConfiguration;
+                })
+                .collect(Collectors.toList());
     }
 
     public TableRuleConfiguration tableOrderInfoRuleConfiguration() {
         TableRuleConfiguration tableRuleConfiguration = new TableRuleConfiguration("order_info", actualDataNodes);
         tableRuleConfiguration.setDatabaseShardingStrategyConfig(
                 new ComplexShardingStrategyConfiguration("id", new ComplexKeysShardingAlgorithmImpl()));
-
         tableRuleConfiguration.setTableShardingStrategyConfig(new StandardShardingStrategyConfiguration("id", tableShardingAlgorithm, tableRangeShardingAlgorithm));
         return tableRuleConfiguration;
     }

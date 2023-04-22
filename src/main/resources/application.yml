@@ -2,7 +2,7 @@ spring:
   application:
     name: sharding-base-on-time
   redis:
-    host: 127.0.0.1
+    host: redis.dev.runan.life
     port: 6379
     lettuce:
       pool:
@@ -19,34 +19,21 @@ spring:
       max-active: 10
   shard:
     data-sources:
-      shard:
-        username: root
-        password: mysqlroot
-        url: jdbc:mysql://192.168.31.65:53306/shard?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-
       # 因为该库为分表的库，所以此处名字不用和上面真实节点库名规则一样
-      shard_01_master:
+      shard_01:
         username: root
         password: mysqlroot
-        url: jdbc:mysql://192.168.31.65:53306/shard_01?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-#      shard_02:
-#        username: root
-#        password: mysqlroot
-#        url: jdbc:mysql://192.168.31.65:53306/shard_02?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:mysql://mysql.dev.runan.life:3306/shard_01?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
       default:
         username: root
         password: mysqlroot
-        url: jdbc:mysql://192.168.31.65:53306/shard-default?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:mysql://mysql.dev.runan.life:3306/shard_default?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         initial-size: 2
         max-active: 10
-      shard_01_slave:
-        username: root
-        password: mysqlroot
-        url: jdbc:mysql://192.168.31.65:53406/shard_01?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     tables:
-      order_info:
-        logicTable: order_info
-        actualDataNodes: shard_0$->{1..2}.order_info_$->{2207..2212}
+      user_info:
+        logic-table: user_info
+        actual-data-nodes: shard_01.user_info_$->{1..2}
         sharding-columns: id
 mybatis:
   mapper-locations: mapper/**/*.xml

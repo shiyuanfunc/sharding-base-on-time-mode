@@ -21,9 +21,8 @@ public class TestClz {
 
     public static void main(String[] args) {
 
-        String str = "20220702150412000";
-        String substring = TableUtils.subTableName(str);
-        System.out.println(substring);
+
+        System.out.println(String.format("%2d", 1));
     }
 
 }
